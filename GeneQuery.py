@@ -23,13 +23,14 @@ def printCursorFormatted(inCursor):
   # Retrieve rows
   dbResult = inCursor.fetchall()
 
-  # Print rows
+  # Loop to print rows
   print("{:<12}{:<14}{:>10}{:>10}  {:<1}".format( \
-    "ID", "Bio Type", "Regn Start", "Regn End", "Description (truncated)"))
+    "ID", "Bio Type", "Regn Start", "Regn End", \
+    "Description (truncated)"))
   for row in dbResult:
     print("{:<12}{:<14}{:>10}{:>10}  {:<1}".format( \
-      row[0], row[1], row[4], row[5], row[9][24:66]))
-  print("Rows in cursor:", dbCursor.rowcount)
+      row[0], row[1], row[2], row[3], row[4][24:66]))
+  print("Rows in result:", dbCursor.rowcount)
   print()
 
 #-----------------------------------------------------------
@@ -40,10 +41,10 @@ def printCursorUnformatted(inCursor):
   # Retrieve rows
   dbResult = inCursor.fetchall()
 
-  # Print rows
+  # Loop to print rows
   for row in dbResult:
     print(row)
-  print("Rows in cursor:", dbCursor.rowcount)
+  print("Rows in result:", dbCursor.rowcount)
   print()
     
 #-----------------------------------------------------------
@@ -59,8 +60,10 @@ db = "homo_sapiens_core_104_38"
 print ("Welcome to Gene Query")
 print ("---------------------\n")
 
-# Attempt to connect to database
+# Attempt to interact with database
 try:
+
+  # Connect to database
   dbConnection = connect(
   host = dbHost,
   user = dbUser,
@@ -69,34 +72,39 @@ try:
   print("Connected to database '", db, "'.", sep="")
   print()
 
+  # Create cursor object
+  dbCursor = dbConnection.cursor()
+
+  # Show gene table attributes
+  print ("Gene Table Attributes")
+  dbCursor.execute("desc gene")
+  printCursorUnformatted(dbCursor)
+
+  # Run gene table query unformatted
+  print ("Gene Table Query (5 fields and 5 rows selected, " + \
+    "unformatted output)")
+  dbCursor.execute( \
+    "select gene_id, biotype, seq_region_start, " + \
+    "seq_region_end, description from gene limit 5")
+  printCursorUnformatted(dbCursor)
+
+  # Run gene table query formatted
+  print ("Gene Table Query (5 fields and 25 rows selected, " + \
+    "formatted output)")
+  dbCursor.execute( \
+    "select gene_id, biotype, seq_region_start, " + \
+    "seq_region_end, description from gene limit 25")
+  printCursorFormatted(dbCursor)
+
+  # Close objects
+  dbCursor.close()
+  dbConnection.close()
+
 # Handle connection error
 except Error as e:
-  print("Error connecting to database '", db, "'.", sep="")
+  print("Error interacting with database '", db, "'.", sep="")
   print("Error message:", e)
   print()
-  os._exit(os.X_OK)
-
-# Create cursor object
-dbCursor = dbConnection.cursor()
-
-# Show gene table attributes
-print ("Gene Table Attributes")
-dbCursor.execute("desc gene")
-printCursorUnformatted(dbCursor)
-
-# Run gene table query unformatted
-print ("Gene Table Query (unformatted, 'select * from gene limit 5')")
-dbCursor.execute("select * from gene limit 5")
-printCursorUnformatted(dbCursor)
-
-# Run gene table query formatted
-print ("Gene Table Query (formatted, 'select * from gene limit 25')")
-dbCursor.execute("select * from gene limit 25")
-printCursorFormatted(dbCursor)
-
-# Close objects
-dbCursor.close()
-dbConnection.close()
 
 # Show application close
 print ("End of Gene Query")

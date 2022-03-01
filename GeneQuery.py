@@ -65,9 +65,9 @@ try:
 
   # Connect to database
   dbConnection = connect(
-  host = dbHost,
-  user = dbUser,
-  database = db
+    host = dbHost,
+    user = dbUser,
+    database = db
   )
   print("Connected to database '", db, "'.", sep="")
   print()

@@ -54,7 +54,7 @@ def printCursorUnformatted(inCursor):
 # Set variables
 dbHost = "useastdb.ensembl.org"
 dbUser = "anonymous"
-db = "homo_sapiens_core_104_38"
+db = "homo_sapiens_core_106_38"
 
 # Show application header
 print ("Welcome to Gene Query")
